@@ -15,9 +15,8 @@ const client = new twitter({
 // https://dev.to/ramonak/javascript-how-to-access-the-return-value-of-a-promise-object-1bck
 function getFollowing(id) {
   let following = [];
-  client
-  .get(`users/${id}/following`, {
-    // 'max_results': '1000',
+  client.get(`users/${id}/following`, {
+    'max_results': '10',
     // 'pagination_token': 'next_token',
     'user.fields': 'public_metrics'
   })
@@ -32,16 +31,18 @@ function getFollowing(id) {
     } else {
       console.log('Not following');
     }
-    console.log(results.meta.next_token); // TODO: loop this token
+    console.log(results.meta.next_token);
   })
-  .catch(console.error);
+  .catch((e) => {
+    console.log(`Something went wrong –\n`, e)
+  })
 }
 
 function getFollowers(id) {
   let followers = [];
   client
   .get(`users/${id}/followers`, {
-    // 'max_results': '1000',
+    'max_results': '10',
     // 'pagination_token': 'next_token',
     'user.fields': 'public_metrics'
   })
@@ -56,21 +57,25 @@ function getFollowers(id) {
     } else {
       console.log('No followers');
     }
-    console.log(results.meta.next_token); // TODO: loop this token
+    console.log(results.meta.next_token);
   })
-  .catch(console.error);
+  .catch((e) => {
+    console.log(`Something went wrong –\n`, e)
+  })
 }
 
-// autocomplete: followers by # of followers, following by # of followers – 1k/each
+// ultimately, would be followers by # followers then following by # followers
 function getFollows(username) {
   client.get(`users/by/username/${username}`)
   .then(response => {
     return response.data.id;
   })
-  .then((id) => {
+  .then(id => {
     getFollowing(id);
     getFollowers(id);
   })
-  .catch(console.error)
+  .catch((e) => {
+    console.log(`Something went wrong –\n`, e)
+  })
 }
 getFollows('bengoertzel');

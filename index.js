@@ -13,23 +13,32 @@ const client = new twitter({
   bearer_token: process.env.bearer_token
 });
 
-function printMetrics(id) {
+function getMetrics(id) {
+  let engagement = { retweet_count: 0, reply_count: 0, like_count: 0, quote_count: 0 }
+
   client.get(`users/${id}/tweets`, {
       exclude: 'replies',
+      max_results: 30,
       'tweet.fields': 'public_metrics'
-      // TODO: max_results?
     })
-    .then(obj => {
-      obj.data.forEach(obj => {
-        console.log(obj.text);
-        console.log(`${JSON.stringify(obj.public_metrics)}\n`);
-        // TODO: extract the retweets, replies, likes, and quotes
+    .then(response => {
+      response.data.forEach(obj => {
+        // console.log(obj.text);
+        // console.log(`${JSON.stringify(obj.public_metrics)}\n`);
+        for (let k in obj.public_metrics) {
+          engagement[k] += obj.public_metrics[k];
+        }
       })
     })
-    .catch(console.error);
+    .then(() => {
+      console.log(engagement);
+    })
+    .catch((e) => {
+      console.log(`Something went wrong –\n`, e)
+    })
 }
 
-function getMetrics(username) {
+function engager(username) {
   client.get(`users/by/username/${username}`, {
       'tweet.fields': 'author_id'
     })
@@ -37,9 +46,11 @@ function getMetrics(username) {
       return obj.data.id;
     })
     .then(id => {
-      printMetrics(id);
+      getMetrics(id);
     })
-    .catch(console.error);
+    .catch((e) => {
+      console.log(`Something went wrong –\n`, e)
+    })
 }
 
-getMetrics('bengoertzel');
+engager('bengoertzel');
