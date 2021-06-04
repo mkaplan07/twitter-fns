@@ -64,7 +64,7 @@ function getFollowers(id) {
   })
 }
 
-// ultimately, would be followers by # followers then following by # followers
+// autocomplete could be followers by # followers then following by # followers
 function getFollows(username) {
   client.get(`users/by/username/${username}`)
   .then(response => {
@@ -78,4 +78,4 @@ function getFollows(username) {
     console.log(`Something went wrong –\n`, e)
   })
 }
-getFollows('bengoertzel');
+getFollows('ethereum');
